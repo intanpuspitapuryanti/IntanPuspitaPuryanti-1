@@ -4,7 +4,393 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuis Hewan untuk Anak-anak</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            background-image: url('assets/images/background.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        h1 {
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 36px;
+            animation: bounce 1s ease-in-out;
+        }
+        .question-container {
+            margin: 30px 0;
+            font-size: 24px;
+            color: #4a4a4a;
+            transition: all 0.5s ease;
+        }
+        .question-text {
+            animation: slideInFromTop 0.6s ease-out;
+        }
+        .question-image {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 15px auto;
+            border: 5px solid #ffd166;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: block; /* Memastikan gambar selalu terlihat */
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            animation: zoomIn 0.8s ease-out;
+        }
+        .question-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .option {
+            padding: 12px 25px;
+            background-color: #4ecdc4;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            min-width: 150px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            animation-fill-mode: both;
+            animation-delay: calc(0.1s * var(--i));
+        }
+        .option:hover {
+            transform: scale(1.08);
+            background-color: #3dbdb4;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+        }
+        .option:active {
+            transform: scale(0.95);
+        }
+        .feedback {
+            margin-top: 20px;
+            font-size: 20px;
+            min-height: 280px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .feedback.show {
+            opacity: 1;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        .feedback-gif {
+            width: 200px;
+            height: 200px;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: block;
+            animation: bounce 1s ease-in-out;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-top: 20px;
+            transition: all 0.5s ease;
+        }
+        .score-update {
+            animation: pulse 0.5s ease-in-out;
+        }
+        .control-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .control-button {
+            padding: 10px 20px;
+            background-color: #ff9f1c;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: slideInFromBottom 0.5s ease-out;
+        }
+        .control-button:hover {
+            background-color: #f08c00;
+            transform: scale(1.08);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+        }
+        .progress-container {
+            width: 80%;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            margin: 20px auto;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #6a5acd;
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0.1) 25%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0.1) 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            animation: slideInFromRight 0.5s ease-out;
+        }
+        .music-button {
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .music-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .debug-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            text-align: left;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            display: none;
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .rotate-in {
+            animation: rotateIn 0.6s ease-out;
+        }
+        
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: rotate(-10deg) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: rotate(0) scale(1);
+            }
+        }
+        
+        .bubble-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            animation: bubbleFloat 3s ease-in infinite;
+            z-index: 1;
+        }
+        
+        @keyframes bubbleFloat {
+            0% {
+                transform: translateY(100%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .question-container {
+                font-size: 18px;
+            }
+            .option {
+                font-size: 16px;
+                min-width: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container bubble-effect">
@@ -45,9 +431,577 @@
         <source src="assets/audio/bgmusic.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Tambahkan script data kuis terlebih dahulu -->
-    <script src="quiz-data.js"></script>
-    <!-- Kemudian script utama -->
-    <script src="script.js"></script>
+    <script>
+        // Debug mode - set ke false untuk menyembunyikan pesan debug
+        const DEBUG = false;
+        
+        // Fungsi untuk menambahkan pesan debug
+        function debug(message) {
+            if (DEBUG) {
+                const debugInfo = document.getElementById("debug-info");
+                debugInfo.style.display = "block";
+                debugInfo.innerHTML += message + "<br>";
+                console.log(message);
+            }
+        }
+
+        // Data kuis dengan gambar dari folder assets
+        const questions = [
+            {
+                question: "Hewan apa ini?",
+                image: "assets/images/cat.jpg",
+                imageAlt: "Kucing",
+                options: ["Kucing", "Anjing", "Kelinci", "Hamster"],
+                answer: "Kucing"
+            },
+            {
+                question: "Hewan apa ini?",
+                image: "assets/images/elephant.jpg",
+                imageAlt: "Gajah",
+                options: ["Jerapah", "Gajah", "Singa", "Harimau"],
+                answer: "Gajah"
+            },
+            {
+                question: "Hewan apa ini?",
+                image: "assets/images/monkey.jpg",
+                imageAlt: "Monyet",
+                options: ["Gorila", "Orangutan", "Monyet", "Simpanse"],
+                answer: "Monyet"
+            },
+            {
+                question: "Hewan apa ini?",
+                image: "assets/images/fish.jpg",
+                imageAlt: "Ikan",
+                options: ["Ikan", "Ubur-ubur", "Gurita", "Lumba-lumba"],
+                answer: "Ikan"
+            },
+            {
+                question: "Hewan apa ini?",
+                image: "assets/images/bird.jpg",
+                imageAlt: "Burung",
+                options: ["Ayam", "Bebek", "Burung", "Angsa"],
+                answer: "Burung"
+            }
+        ];
+
+        // Variabel global
+        let currentQuestion = 0;
+        let score = 0;
+        let isMusicPlaying = false;
+        let answersDisabled = false;
+        let audioInitialized = false;
+
+        // Elemen DOM
+        const questionText = document.getElementById("question-text");
+        const questionImage = document.getElementById("question-image");
+        const optionsContainer = document.getElementById("options");
+        const feedbackContainer = document.getElementById("feedback");
+        const scoreElement = document.getElementById("score");
+        const nextButton = document.getElementById("next-button");
+        const restartButton = document.getElementById("restart-button");
+        const progressBar = document.getElementById("progress");
+        const musicToggle = document.getElementById("music-toggle");
+        const container = document.querySelector(".container");
+        
+        // Audio elements
+        const correctSound = document.getElementById("correct-sound");
+        const incorrectSound = document.getElementById("incorrect-sound");
+        const backgroundMusic = document.getElementById("bg-music");
+
+        // Fungsi untuk membuat gelembung animasi
+        function createBubbles() {
+            const bubbleContainer = document.querySelector('.bubble-effect');
+            const bubbleCount = 10;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                // Ukuran acak
+                const size = Math.random() * 60 + 20;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Posisi acak
+                const left = Math.random() * 100;
+                bubble.style.left = `${left}%`;
+                
+                // Delay acak
+                const animationDelay = Math.random() * 15;
+                bubble.style.animationDelay = `${animationDelay}s`;
+                
+                // Durasi acak
+                const animationDuration = Math.random() * 5 + 5;
+                bubble.style.animationDuration = `${animationDuration}s`;
+                
+                bubbleContainer.appendChild(bubble);
+            }
+        }
+
+        // Fungsi untuk inisialisasi audio
+        function initAudio() {
+            if (!audioInitialized) {
+                // Set volume untuk audio background music
+                backgroundMusic.volume = 0.5;
+                
+                // Pre-load audio untuk mengurangi delay
+                correctSound.load();
+                incorrectSound.load();
+                backgroundMusic.load();
+                
+                // Pastikan audio tidak tumpang tindih
+                correctSound.oncanplaythrough = function() {
+                    debug("Correct sound ready");
+                };
+                
+                incorrectSound.oncanplaythrough = function() {
+                    debug("Incorrect sound ready");
+                };
+                
+                // Menghindari multiple play
+                correctSound.onplay = function() {
+                    debug("Correct sound playing");
+                };
+                
+                incorrectSound.onplay = function() {
+                    debug("Incorrect sound playing");
+                };
+                
+                debug("Audio elements initialized");
+                audioInitialized = true;
+            }
+        }
+
+        // Kontrol musik latar
+        musicToggle.addEventListener("click", () => {
+            if (!audioInitialized) {
+                initAudio();
+            }
+            
+            if (isMusicPlaying) {
+                backgroundMusic.pause();
+                musicToggle.innerHTML = "♫";
+            } else {
+                backgroundMusic.play().catch(e => {
+                    debug("Error memutar musik latar: " + e);
+                    alert("Klik tombol musik sekali lagi untuk memulai musik!");
+                });
+                musicToggle.innerHTML = "⏸";
+            }
+            isMusicPlaying = !isMusicPlaying;
+            
+            // Animasi tombol musik
+            musicToggle.classList.remove("pulse");
+            void musicToggle.offsetWidth; // Trigger reflow
+            musicToggle.classList.add("pulse");
+        });
+
+        // Memuat gambar di awal
+        function preloadImages() {
+            debug("Mulai pre-loading gambar...");
+            
+            questions.forEach(q => {
+                const img = new Image();
+                img.src = q.image;
+                img.onload = () => debug(`Gambar berhasil dimuat: ${q.image}`);
+                img.onerror = () => debug(`Gagal memuat gambar: ${q.image}`);
+            });
+        }
+
+        // Inisialisasi kuis
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            initAudio();
+            preloadImages();
+            createBubbles();
+            
+            // Reset tampilan
+            questionImage.style.display = "block";
+            restartButton.style.display = "none";
+            feedbackContainer.innerHTML = "";
+            
+            showQuestion();
+            updateScore();
+            
+            // Menampilkan pop-up untuk memulai musik
+            setTimeout(() => {
+                alert("Selamat datang di Kuis Hewan untuk Anak-anak! Klik tombol musik di pojok kanan bawah untuk memulai musik latar.");
+            }, 1000);
+        }
+
+        // Menampilkan pertanyaan dengan transisi
+        function showQuestion() {
+            // Transisi fade out
+            document.getElementById("question-container").classList.add("fade-out");
+            
+            setTimeout(() => {
+                nextButton.style.display = "none";
+                feedbackContainer.innerHTML = "";
+                feedbackContainer.classList.remove("show");
+                answersDisabled = false;
+                
+                if (currentQuestion >= questions.length) {
+                    showResults();
+                    return;
+                }
+                
+                const question = questions[currentQuestion];
+                questionText.textContent = question.question;
+                
+                // Pastikan gambar selalu ditampilkan
+                questionImage.style.display = "block";
+                questionImage.src = question.image;
+                questionImage.alt = question.imageAlt;
+                
+                // Reset classes untuk animasi baru
+                questionImage.classList.remove("zoomIn");
+                void questionImage.offsetWidth; // Trigger reflow
+                questionImage.classList.add("zoomIn");
+                
+                // Error handling untuk gambar
+                questionImage.onerror = function() {
+                    debug(`Failed to load image: ${question.image}`);
+                    this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'%3E%3Crect width='250' height='250' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-size='20' text-anchor='middle' dominant-baseline='middle' fill='%23999'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E";
+                };
+                
+                optionsContainer.innerHTML = "";
+                question.options.forEach((option, index) => {
+                    const button = document.createElement("button");
+                    button.textContent = option;
+                    button.className = "option";
+                    // Tambahkan variabel CSS untuk delay animasi
+                    button.style.setProperty('--i', index);
+                    button.addEventListener("click", () => {
+                        if (!answersDisabled) {
+                            checkAnswer(option);
+                        }
+                    });
+                    optionsContainer.appendChild(button);
+                });
+                
+                // Hapus kelas fade-out dan tambahkan rotate-in untuk efek masuk
+                document.getElementById("question-container").classList.remove("fade-out");
+                document.getElementById("question-container").classList.add("rotate-in");
+                
+                // Update progress bar dengan animasi
+                progressBar.style.width = `${(currentQuestion / questions.length) * 100}%`;
+            }, 500); // Tunggu fade out selesai
+        }
+
+        // Memeriksa jawaban
+        function checkAnswer(selectedOption) {
+            // Prevent multiple clicks
+            if (answersDisabled) return;
+            answersDisabled = true;
+            
+            const question = questions[currentQuestion];
+            const isCorrect = selectedOption === question.answer;
+            
+            // Pastikan audio sudah diinisialisasi
+            if (!audioInitialized) {
+                initAudio();
+            }
+            
+            // Play sound feedback - dengan pengecekan tambahan untuk mencegah double play
+            try {
+                if (isCorrect) {
+                    // Berhenti dan reset suara terlebih dahulu
+                    correctSound.pause();
+                    correctSound.currentTime = 0;
+                    
+                    // Menghapus event handler sebelumnya jika ada
+                    correctSound.onended = null;
+                    
+                    // Putar audio dengan satu instance
+                    setTimeout(() => {
+                        correctSound.play().catch(e => debug("Error playing correct sound: " + e));
+                    }, 10);
+                } else {
+                    // Berhenti dan reset suara terlebih dahulu
+                    incorrectSound.pause();
+                    incorrectSound.currentTime = 0;
+                    
+                    // Putar audio dengan satu instance
+                    setTimeout(() => {
+                        incorrectSound.play().catch(e => debug("Error playing incorrect sound: " + e));
+                    }, 10);
+                }
+            } catch (e) {
+                debug("Error playing sound: " + e);
+            }
+            
+            // Nonaktifkan semua tombol opsi dengan animasi
+            const optionButtons = document.querySelectorAll(".option");
+            optionButtons.forEach(button => {
+                button.disabled = true;
+                if (button.textContent === question.answer) {
+                    button.style.backgroundColor = "#4CAF50"; // Hijau untuk jawaban benar
+                    if (button.textContent === selectedOption) {
+                        button.style.transform = "scale(1.1)";
+                        button.style.boxShadow = "0 0 20px rgba(76, 175, 80, 0.8)";
+                    }
+                } else if (button.textContent === selectedOption && !isCorrect) {
+                    button.style.backgroundColor = "#F44336"; // Merah untuk jawaban salah yang dipilih
+                    button.style.transform = "scale(0.95)";
+                }
+            });
+            
+            // Tampilkan feedback dengan GIF dan animasi
+            if (isCorrect) {
+                score++;
+                feedbackContainer.innerHTML = `
+                    <p style='color: green; font-weight: bold; font-size: 24px;'>Benar!</p>
+                    <img src="assets/gifs/correct1.gif" class="feedback-gif" alt="Correct feedback">
+                `;
+            } else {
+                feedbackContainer.innerHTML = `
+                    <p style='color: red; font-weight: bold; font-size: 24px;'>Oops! Jawaban yang benar adalah ${question.answer}</p>
+                    <img src="assets/gifs/incorrect1.gif" class="feedback-gif" alt="Incorrect feedback">
+                `;
+            }
+            
+            // Animasi untuk feedback
+            setTimeout(() => {
+                feedbackContainer.classList.add("show");
+            }, 100);
+            
+            updateScore();
+            
+            // Tampilkan tombol selanjutnya dengan animasi
+            setTimeout(() => {
+                nextButton.style.display = "block";
+                nextButton.classList.remove("slideInFromBottom");
+                void nextButton.offsetWidth; // Trigger reflow
+                nextButton.classList.add("slideInFromBottom");
+            }, 800);
+        }
+
+        // Update skor dengan animasi
+        function updateScore() {
+            // Animasi untuk perubahan skor
+            scoreElement.classList.remove("score-update");
+            void scoreElement.offsetWidth; // Trigger reflow
+            scoreElement.classList.add("score-update");
+            scoreElement.textContent = `Skor: ${score}`;
+        }
+
+        // Menampilkan hasil akhir
+        function showResults() {
+            questionText.textContent = "Kuis Selesai!";
+            questionImage.style.display = "none";
+            optionsContainer.innerHTML = "";
+            feedbackContainer.innerHTML = "";
+            
+            const percentage = (score / questions.length) * 100;
+            let message;
+            let resultGif;
+            
+            if (percentage >= 80) {
+                message = "Luar biasa! Kamu sangat pintar!";
+                resultGif = "assets/gifs/correct1.gif";
+            } else if (percentage >= 60) {
+                message = "Bagus! Kamu melakukannya dengan baik!";
+                resultGif = "assets/gifs/correct1.gif";
+            } else {
+                message = "Jangan menyerah! Coba lagi ya!";
+                resultGif = "assets/gifs/incorrect1.gif";
+            }
+            
+            // Tambahkan animasi untuk hasil
+            document.getElementById("question-container").classList.add("bounce");
+            
+            feedbackContainer.innerHTML = `
+                <p style='font-size: 24px; font-weight: bold;'>${message}</p>
+                <img src="${resultGif}" class="feedback-gif" alt="Result feedback">
+                <p>Kamu mendapatkan ${score} dari ${questions.length} soal.</p>
+            `;
+            
+            // Tampilkan feedback dengan animasi
+            setTimeout(() => {
+                feedbackContainer.classList.add("show");
+            }, 100);
+            
+            // Tampilkan tombol mulai ulang dengan animasi
+            setTimeout(() => {
+                restartButton.style.display = "block";
+                restartButton.classList.remove("slideInFromBottom");
+                void restartButton.offsetWidth; // Trigger reflow
+                restartButton.classList.add("slideInFromBottom");
+            }, 800);
+            
+            // Animasi progress bar selesai
+            progressBar.style.width = "100%";
+            
+            // Tambahkan efek konfeti untuk hasil yang baik
+            if (percentage >= 60) {
+                createConfetti();
+            }
+        }
+        
+        // Fungsi untuk membuat efek konfeti
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.borderRadius = '50%';
+                confetti.style.zIndex = '1000';
+                confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
+                document.body.appendChild(confetti);
+                
+                // Hapus konfeti setelah animasi selesai
+                setTimeout(() => {
+                    document.body.removeChild(confetti);
+                }, 5000);
+            }
+        }
+        
+        // Fungsi untuk warna acak
+        function getRandomColor() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffd166', '#6a5acd', '#ff9f1c'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Event listener
+        nextButton.addEventListener("click", () => {
+            // Animasi transisi
+            document.getElementById("question-container").classList.add("fade-out");
+            
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 500);
+        });
+        
+        restartButton.addEventListener("click", () => {
+            // Animasi untuk restart
+            document.querySelector(".container").classList.add("fade-out");
+            
+            setTimeout(() => {
+                document.querySelector(".container").classList.remove("fade-out");
+                initQuiz();
+            }, 500);
+        });
+
+        // Inisialisasi audio hanya sekali saat interaksi pertama dengan dokumen
+        let hasInitializedAudio = false;
+        document.addEventListener("click", function initAudioOnFirstInteraction() {
+            if (!hasInitializedAudio) {
+                initAudio();
+                hasInitializedAudio = true;
+                document.removeEventListener("click", initAudioOnFirstInteraction);
+                debug("Audio initialized on first interaction");
+            }
+        }, { once: true });
+
+        // Tambahkan animasi konfeti untuk kuis
+        function addConfettiEffect() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes confettiFall {
+                    0% {
+                        transform: translateY(0) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(360deg);
+                        opacity: 0;
+                    }
+                }
+                
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+                
+                .shake {
+                    animation: shake 0.5s ease-in-out;
+                }
+                
+                @keyframes float {
+                    0% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
+                    100% { transform: translateY(0); }
+                }
+                
+                .float-animation {
+                    animation: float 3s ease-in-out infinite;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Tambahkan efek mengapung ke gambar pertanyaan
+        function addFloatEffect() {
+            questionImage.classList.add('float-animation');
+        }
+// Fungsi untuk menambahkan efek suara hover pada tombol
+function addHoverSoundToButtons() {
+    // Buat elemen audio untuk hover sound
+    const hoverSound = document.createElement('audio');
+    hoverSound.id = 'hover-sound';
+    hoverSound.preload = 'auto';
+    hoverSound.volume = 0.3; // Set volume lebih rendah agar tidak mengganggu
+    
+    // Tambahkan source untuk file hover.mp3
+    const hoverSoundSource = document.createElement('source');
+    hoverSoundSource.src = 'assets/audio/hover.mp3';
+    hoverSoundSource.type = 'audio/mpeg';
+    
+    // Tambahkan source ke audio element
+    hoverSound.appendChild(hoverSoundSource);
+    
+    // Tambahkan ke body
+    document.body.appendChild(hoverSound);
+    
+    // Fungsi untuk memutar suara hover
+    function playHoverSound() {
+        // Reset dan putar audio
+        const sound = document.getElementById('hover-sound');
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => {
+                // Tangani error jika browser belum siap memutar audio
+                console.log("Error playing hover sound: " + e);
+            });
+        }
+    }
+    
+    // Tambahkan event listener ke semua tombol yang ada saat ini
+    document.querySelectorAll('.option, .control-button, .music-button').forEach(button => {
+        button.addEventListener('mouseenter', playHoverSound);
+    });
+    
+    // Untuk tombol yang dibuat dinamis (seperti opsi jawaban)
+    // Gunakan event delegation untuk menangkap semua hover event pada container
+    document.querySelector('.container').addEventListener('mouseenter', function(e) {
+        // Cek apakah target adalah tombol
+        if (e.target.classList.contains('option') || 
+            e.target.classList.contains('control-button') || 
+            e.target.classList.contains('music-button')) {
+            playHoverSound();
+        }
+    }, true);
+    
+    console.log("Hover sound effect added to buttons");
+}
+        // Mulai kuis saat halaman dimuat
+        window.onload = function() {
+            addConfettiEffect();
+            initQuiz();
+            
+            // Tambahkan efek mengapung ke gambar setelah beberapa detik
+            setTimeout(addFloatEffect, 2000);
+            // Tambahkan efek suara hover pada tombol
+    addHoverSoundToButtons();
+        };
+    </script>
 </body>
 </html>
