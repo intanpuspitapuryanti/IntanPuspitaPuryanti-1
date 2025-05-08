@@ -217,8 +217,8 @@
     </audio>
 
     <script>
-        // Debug mode - set ke true untuk melihat pesan debug
-        const DEBUG = true;
+        // Debug mode - set ke false untuk menyembunyikan pesan debug
+        const DEBUG = false;
         
         // Fungsi untuk menambahkan pesan debug
         function debug(message) {
@@ -302,6 +302,24 @@
                 correctSound.load();
                 incorrectSound.load();
                 backgroundMusic.load();
+                
+                // Pastikan audio tidak tumpang tindih
+                correctSound.oncanplaythrough = function() {
+                    debug("Correct sound ready");
+                };
+                
+                incorrectSound.oncanplaythrough = function() {
+                    debug("Incorrect sound ready");
+                };
+                
+                // Menghindari multiple play
+                correctSound.onplay = function() {
+                    debug("Correct sound playing");
+                };
+                
+                incorrectSound.onplay = function() {
+                    debug("Incorrect sound playing");
+                };
                 
                 debug("Audio elements initialized");
                 audioInitialized = true;
@@ -416,14 +434,29 @@
                 initAudio();
             }
             
-            // Play sound feedback
+            // Play sound feedback - dengan pengecekan tambahan untuk mencegah double play
             try {
                 if (isCorrect) {
+                    // Berhenti dan reset suara terlebih dahulu
+                    correctSound.pause();
                     correctSound.currentTime = 0;
-                    correctSound.play();
+                    
+                    // Menghapus event handler sebelumnya jika ada
+                    correctSound.onended = null;
+                    
+                    // Putar audio dengan satu instance
+                    setTimeout(() => {
+                        correctSound.play().catch(e => debug("Error playing correct sound: " + e));
+                    }, 10);
                 } else {
+                    // Berhenti dan reset suara terlebih dahulu
+                    incorrectSound.pause();
                     incorrectSound.currentTime = 0;
-                    incorrectSound.play();
+                    
+                    // Putar audio dengan satu instance
+                    setTimeout(() => {
+                        incorrectSound.play().catch(e => debug("Error playing incorrect sound: " + e));
+                    }, 10);
                 }
             } catch (e) {
                 debug("Error playing sound: " + e);
@@ -506,10 +539,15 @@
         
         restartButton.addEventListener("click", initQuiz);
 
-        // Inisialisasi audio saat interaksi pertama dengan dokumen
+        // Inisialisasi audio hanya sekali saat interaksi pertama dengan dokumen
+        let hasInitializedAudio = false;
         document.addEventListener("click", function initAudioOnFirstInteraction() {
-            initAudio();
-            document.removeEventListener("click", initAudioOnFirstInteraction);
+            if (!hasInitializedAudio) {
+                initAudio();
+                hasInitializedAudio = true;
+                document.removeEventListener("click", initAudioOnFirstInteraction);
+                debug("Audio initialized on first interaction");
+            }
         }, { once: true });
 
         // Mulai kuis saat halaman dimuat
