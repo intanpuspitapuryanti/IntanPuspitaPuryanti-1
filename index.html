@@ -942,16 +942,7 @@
         function addFloatEffect() {
             questionImage.classList.add('float-animation');
         }
-
-        // Mulai kuis saat halaman dimuat
-        window.onload = function() {
-            addConfettiEffect();
-            initQuiz();
-            
-            // Tambahkan efek mengapung ke gambar setelah beberapa detik
-            setTimeout(addFloatEffect, 2000);
-        };
-        // Fungsi untuk menambahkan efek suara hover pada tombol
+// Fungsi untuk menambahkan efek suara hover pada tombol
 function addHoverSoundToButtons() {
     // Buat elemen audio untuk hover sound
     const hoverSound = document.createElement('audio');
@@ -974,49 +965,43 @@ function addHoverSoundToButtons() {
     function playHoverSound() {
         // Reset dan putar audio
         const sound = document.getElementById('hover-sound');
-        sound.currentTime = 0;
-        sound.play().catch(e => {
-            // Tangani error jika browser belum siap memutar audio
-            debug("Error playing hover sound: " + e);
-        });
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => {
+                // Tangani error jika browser belum siap memutar audio
+                console.log("Error playing hover sound: " + e);
+            });
+        }
     }
     
-    // Fungsi untuk menambahkan event listener hover ke elemen
-    function addHoverSound(selector) {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach(element => {
-            element.addEventListener('mouseenter', playHoverSound);
-        });
-    }
-    
-    // Tambahkan event listener ke semua tombol yang ada
-    addHoverSound('.option');
-    addHoverSound('.control-button');
-    addHoverSound('.music-button');
-    
-    // Untuk tombol yang dibuat dinamis (seperti opsi jawaban)
-    // Gunakan MutationObserver untuk memantau perubahan DOM
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.addedNodes.length) {
-                mutation.addedNodes.forEach((node) => {
-                    // Cek apakah node adalah elemen dan memiliki class yang sesuai
-                    if (node.nodeType === 1 && 
-                        (node.classList.contains('option') || 
-                         node.classList.contains('control-button'))) {
-                        node.addEventListener('mouseenter', playHoverSound);
-                    }
-                });
-            }
-        });
+    // Tambahkan event listener ke semua tombol yang ada saat ini
+    document.querySelectorAll('.option, .control-button, .music-button').forEach(button => {
+        button.addEventListener('mouseenter', playHoverSound);
     });
     
-    // Mulai observasi pada container opsi dan container control button
-    observer.observe(document.getElementById('options'), { childList: true });
-    observer.observe(document.querySelector('.control-buttons'), { childList: true });
+    // Untuk tombol yang dibuat dinamis (seperti opsi jawaban)
+    // Gunakan event delegation untuk menangkap semua hover event pada container
+    document.querySelector('.container').addEventListener('mouseenter', function(e) {
+        // Cek apakah target adalah tombol
+        if (e.target.classList.contains('option') || 
+            e.target.classList.contains('control-button') || 
+            e.target.classList.contains('music-button')) {
+            playHoverSound();
+        }
+    }, true);
     
-    debug("Hover sound effect added to buttons");
+    console.log("Hover sound effect added to buttons");
 }
+        // Mulai kuis saat halaman dimuat
+        window.onload = function() {
+            addConfettiEffect();
+            initQuiz();
+            
+            // Tambahkan efek mengapung ke gambar setelah beberapa detik
+            setTimeout(addFloatEffect, 2000);
+            // Tambahkan efek suara hover pada tombol
+    addHoverSoundToButtons();
+        };
     </script>
 </body>
 </html>
