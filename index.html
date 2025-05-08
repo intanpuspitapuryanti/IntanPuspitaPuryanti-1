@@ -258,43 +258,67 @@
             }
         ];
 
-        // Pre-load semua audio untuk menghindari delay
-        const correctSound = new Audio();
-        correctSound.src = "assets/audio/correct.mp3";
-        correctSound.preload = "auto";
+        // Buat beberapa instance audio untuk menghindari masalah pemutaran ganda
+        const correctSounds = [
+            new Audio("assets/audio/correct.mp3"),
+            new Audio("assets/audio/correct.mp3"),
+            new Audio("assets/audio/correct.mp3")
+        ];
         
-        const incorrectSound = new Audio();
-        incorrectSound.src = "assets/audio/incorrect.mp3";
-        incorrectSound.preload = "auto";
+        const incorrectSounds = [
+            new Audio("assets/audio/incorrect.mp3"),
+            new Audio("assets/audio/incorrect.mp3"),
+            new Audio("assets/audio/incorrect.mp3")
+        ];
+        
+        // Pre-load audio untuk menghindari delay
+        correctSounds.forEach(sound => {
+            sound.preload = "auto";
+            sound.load();
+        });
+        
+        incorrectSounds.forEach(sound => {
+            sound.preload = "auto";
+            sound.load();
+        });
+
+        let currentCorrectSound = 0;
+        let currentIncorrectSound = 0;
         
         // Musik latar
-        const backgroundMusic = new Audio();
-        backgroundMusic.src = "assets/audio/bgmusic.mp3";
+        const backgroundMusic = new Audio("assets/audio/bgmusic.mp3");
         backgroundMusic.loop = true;
         backgroundMusic.volume = 0.5;
         backgroundMusic.preload = "auto";
 
-        // GIF Feedback dari folder assets - menggunakan path lengkap
+        // GIF Feedback dari folder assets dengan path relatif
         const correctGifs = [
-            "assets/gifs/correct1.gif", // Tepuk tangan
-            "assets/gifs/correct2.gif", // Bintang
-            "assets/gifs/correct3.gif"  // Thumbs up
+            "assets/gifs/correct1.gif", 
+            "assets/gifs/correct2.gif", 
+            "assets/gifs/correct3.gif"
         ];
         
         const incorrectGifs = [
-            "assets/gifs/incorrect1.gif", // Kecewa
-            "assets/gifs/incorrect2.gif", // Sedih
-            "assets/gifs/incorrect3.gif"  // Coba lagi
+            "assets/gifs/incorrect1.gif", 
+            "assets/gifs/incorrect2.gif", 
+            "assets/gifs/incorrect3.gif"
         ];
 
-        // Simulasi GIF jika GIF tidak tersedia
+        // Fallback untuk GIF
         const fallbackCorrectEmoji = "🎉👏✨";
         const fallbackIncorrectEmoji = "😢🙁😔";
+
+        // Variabel untuk menyimpan GIF yang sudah diketahui ada/tidak ada
+        const gifStatus = {
+            correct: {},
+            incorrect: {}
+        };
 
         let currentQuestion = 0;
         let score = 0;
         let isMusicPlaying = false;
-        let audioContext = null;
+        let audioInitialized = false;
+        let answersDisabled = false;
 
         // Elemen DOM
         const questionText = document.getElementById("question-text");
@@ -308,53 +332,119 @@
         const progressBar = document.getElementById("progress");
         const musicToggle = document.getElementById("music-toggle");
 
-        // Inisialisasi AudioContext untuk menangani masalah audio
+        // Inisialisasi audio untuk menghindari kebijakan autoplay browser
         function initAudio() {
-            try {
-                // Buat AudioContext jika browser mendukung
-                window.AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (window.AudioContext) {
-                    audioContext = new AudioContext();
-                    debug("AudioContext berhasil dibuat");
-                }
-            } catch (e) {
-                debug("Error membuat AudioContext: " + e);
-            }
-        }
-
-        // Play audio dengan penanganan kesalahan yang lebih baik
-        function playSound(sound) {
-            // Reset posisi audio ke awal
-            sound.currentTime = 0;
+            if (audioInitialized) return;
             
-            // Coba putar
-            sound.play().then(() => {
-                debug("Audio berhasil diputar");
-            }).catch(e => {
-                debug("Error memutar audio: " + e);
+            // Inisialisasi semua audio
+            function initSounds() {
+                correctSounds.forEach(sound => {
+                    sound.volume = 0;
+                    sound.play().then(() => {
+                        sound.pause();
+                        sound.currentTime = 0;
+                        sound.volume = 1;
+                    }).catch(e => {
+                        debug("Error saat menyiapkan audio: " + e);
+                    });
+                });
                 
-                // Jika audioContext tersedia, coba cara alternatif
-                if (audioContext) {
-                    try {
-                        // Buat source node baru untuk audio
-                        const source = audioContext.createMediaElementSource(sound);
-                        source.connect(audioContext.destination);
-                        sound.play();
-                        debug("Audio berhasil diputar dengan AudioContext");
-                    } catch (err) {
-                        debug("AudioContext error: " + err);
-                    }
-                }
-            });
+                incorrectSounds.forEach(sound => {
+                    sound.volume = 0;
+                    sound.play().then(() => {
+                        sound.pause();
+                        sound.currentTime = 0;
+                        sound.volume = 1;
+                    }).catch(e => {
+                        debug("Error saat menyiapkan audio: " + e);
+                    });
+                });
+                
+                backgroundMusic.volume = 0;
+                backgroundMusic.play().then(() => {
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0;
+                    backgroundMusic.volume = 0.5;
+                }).catch(e => {
+                    debug("Error saat menyiapkan musik latar: " + e);
+                });
+                
+                audioInitialized = true;
+                debug("Audio berhasil diinisialisasi");
+            }
+            
+            // Inisialisasi audio pada interaksi pengguna
+            document.body.addEventListener('click', function initOnInteraction() {
+                initSounds();
+                document.body.removeEventListener('click', initOnInteraction);
+            }, { once: true });
         }
 
-        // Memeriksa apakah GIF ada dan dapat dimuat
-        function checkGifExists(url) {
+        // Fungsi untuk memutar suara dengan buffer pooling (mencegah delay)
+        function playCorrectSound() {
+            const sound = correctSounds[currentCorrectSound];
+            sound.currentTime = 0;  // Reset posisi audio
+            
+            // Coba putar audio
+            const playPromise = sound.play();
+            if (playPromise) {
+                playPromise.catch(e => {
+                    debug("Error memutar suara benar: " + e);
+                });
+            }
+            
+            // Rotasi ke instance audio berikutnya untuk menghindari delay
+            currentCorrectSound = (currentCorrectSound + 1) % correctSounds.length;
+        }
+        
+        function playIncorrectSound() {
+            const sound = incorrectSounds[currentIncorrectSound];
+            sound.currentTime = 0;  // Reset posisi audio
+            
+            // Coba putar audio
+            const playPromise = sound.play();
+            if (playPromise) {
+                playPromise.catch(e => {
+                    debug("Error memutar suara salah: " + e);
+                });
+            }
+            
+            // Rotasi ke instance audio berikutnya untuk menghindari delay
+            currentIncorrectSound = (currentIncorrectSound + 1) % incorrectSounds.length;
+        }
+
+        // Memeriksa apakah GIF ada dan dapat dimuat dengan caching hasil
+        async function checkGifExists(url) {
+            // Cek apakah kita sudah memeriksa GIF ini sebelumnya
+            if (url.includes('correct') && gifStatus.correct[url] !== undefined) {
+                return gifStatus.correct[url];
+            } else if (url.includes('incorrect') && gifStatus.incorrect[url] !== undefined) {
+                return gifStatus.incorrect[url];
+            }
+            
+            // Jika belum, periksa GIF
             return new Promise((resolve) => {
                 const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
+                img.onload = () => {
+                    // Simpan hasilnya untuk penggunaan berikutnya
+                    if (url.includes('correct')) {
+                        gifStatus.correct[url] = true;
+                    } else if (url.includes('incorrect')) {
+                        gifStatus.incorrect[url] = true;
+                    }
+                    resolve(true);
+                };
+                img.onerror = () => {
+                    // Simpan hasilnya untuk penggunaan berikutnya
+                    if (url.includes('correct')) {
+                        gifStatus.correct[url] = false;
+                    } else if (url.includes('incorrect')) {
+                        gifStatus.incorrect[url] = false;
+                    }
+                    resolve(false);
+                };
+                // Tambahkan parameter acak untuk mencegah caching browser
+                img.src = url + `?nocache=${Date.now()}`;
             });
         }
 
@@ -366,7 +456,7 @@
             
             if (gifExists) {
                 debug("GIF ditemukan: " + gifUrl);
-                feedbackGif.src = gifUrl;
+                feedbackGif.src = gifUrl + `?nocache=${Date.now()}`; // Tambahkan parameter untuk mencegah cache
                 feedbackGif.style.display = "block";
             } else {
                 debug("GIF tidak ditemukan: " + gifUrl);
@@ -381,18 +471,17 @@
 
         // Kontrol musik
         musicToggle.addEventListener("click", () => {
+            if (!audioInitialized) {
+                initAudio();
+            }
+            
             if (isMusicPlaying) {
                 backgroundMusic.pause();
                 musicToggle.innerHTML = "♫";
             } else {
-                // Pastikan AudioContext dimulai jika ada
-                if (audioContext && audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
-                
                 backgroundMusic.play().catch(e => {
-                    debug("Autoplay diblokir: " + e);
-                    alert("Klik tombol musik untuk memulai musik latar!");
+                    debug("Error memutar musik latar: " + e);
+                    alert("Klik tombol musik sekali lagi untuk memulai musik!");
                 });
                 musicToggle.innerHTML = "⏸";
             }
@@ -410,51 +499,12 @@
                 img.onerror = () => debug(`Gagal memuat gambar: ${q.image}`);
             });
             
-            correctGifs.forEach(url => {
-                const img = new Image();
-                img.src = url;
-                img.onload = () => debug(`GIF berhasil dimuat: ${url}`);
-                img.onerror = () => debug(`Gagal memuat GIF: ${url}`);
+            // Preload GIF
+            [...correctGifs, ...incorrectGifs].forEach(url => {
+                checkGifExists(url).then(exists => {
+                    debug(`GIF ${url}: ${exists ? 'ditemukan' : 'tidak ditemukan'}`);
+                });
             });
-            
-            incorrectGifs.forEach(url => {
-                const img = new Image();
-                img.src = url;
-                img.onload = () => debug(`GIF berhasil dimuat: ${url}`);
-                img.onerror = () => debug(`Gagal memuat GIF: ${url}`);
-            });
-        }
-
-        // Fungsi untuk menguji apakah file dapat diakses
-        function checkFileExists(url) {
-            const http = new XMLHttpRequest();
-            http.open('HEAD', url, false);
-            try {
-                http.send();
-                return http.status !== 404;
-            } catch (e) {
-                debug(`Error checking ${url}: ${e}`);
-                return false;
-            }
-        }
-
-        // Fungsi untuk menunjukkan error jika file tidak ada
-        function logFileStatus() {
-            debug("Checking file access...");
-            
-            // Check background image
-            const bgImgUrl = "assets/images/background.jpg";
-            debug(`Background image ${bgImgUrl}: ${checkFileExists(bgImgUrl) ? 'OK' : 'FAILED'}`);
-            
-            // Check first image
-            debug(`First question image ${questions[0].image}: ${checkFileExists(questions[0].image) ? 'OK' : 'FAILED'}`);
-            
-            // Check audio files
-            debug(`Background music: ${checkFileExists("assets/audio/bgmusic.mp3") ? 'OK' : 'FAILED'}`);
-            debug(`Correct sound: ${checkFileExists("assets/audio/correct.mp3") ? 'OK' : 'FAILED'}`);
-            
-            // Check first GIF
-            debug(`First correct GIF: ${correctGifs[0]}: ${checkFileExists(correctGifs[0]) ? 'OK' : 'FAILED'}`);
         }
 
         // Inisialisasi kuis
@@ -463,12 +513,12 @@
             score = 0;
             initAudio();
             preloadImages();
-            logFileStatus();
             
             // Reset tampilan
             questionImage.style.display = "block";
             feedbackGif.style.display = "none";
             restartButton.style.display = "none";
+            feedbackContainer.innerHTML = "";
             
             showQuestion();
             updateScore();
@@ -484,6 +534,7 @@
             nextButton.style.display = "none";
             feedbackGif.style.display = "none";
             feedbackContainer.innerHTML = "";
+            answersDisabled = false;
             
             if (currentQuestion >= questions.length) {
                 showResults();
@@ -509,7 +560,11 @@
                 const button = document.createElement("button");
                 button.textContent = option;
                 button.className = "option";
-                button.addEventListener("click", () => checkAnswer(option));
+                button.addEventListener("click", () => {
+                    if (!answersDisabled) {
+                        checkAnswer(option);
+                    }
+                });
                 optionsContainer.appendChild(button);
             });
             
@@ -519,8 +574,19 @@
 
         // Memeriksa jawaban
         async function checkAnswer(selectedOption) {
+            // Prevent multiple clicks
+            if (answersDisabled) return;
+            answersDisabled = true;
+            
             const question = questions[currentQuestion];
             const isCorrect = selectedOption === question.answer;
+            
+            // Play sound immediately before any other operations
+            if (isCorrect) {
+                playCorrectSound();
+            } else {
+                playIncorrectSound();
+            }
             
             // Nonaktifkan semua tombol opsi
             const optionButtons = document.querySelectorAll(".option");
@@ -536,17 +602,15 @@
             // Tampilkan feedback
             if (isCorrect) {
                 score++;
-                playSound(correctSound);
                 feedbackContainer.innerHTML = "<p style='color: green; font-weight: bold; font-size: 24px;'>Benar! 🎉</p>";
                 
-                // Mencoba memuat dan menampilkan GIF
+                // Coba memuat dan menampilkan GIF
                 const gifUrl = correctGifs[Math.floor(Math.random() * correctGifs.length)];
                 await loadAndShowGif(gifUrl, true);
             } else {
-                playSound(incorrectSound);
                 feedbackContainer.innerHTML = `<p style='color: red; font-weight: bold; font-size: 24px;'>Oops! Jawaban yang benar adalah ${question.answer} 😢</p>`;
                 
-                // Mencoba memuat dan menampilkan GIF
+                // Coba memuat dan menampilkan GIF
                 const gifUrl = incorrectGifs[Math.floor(Math.random() * incorrectGifs.length)];
                 await loadAndShowGif(gifUrl, false);
             }
@@ -589,7 +653,7 @@
                 <p>Kamu mendapatkan ${score} dari ${questions.length} soal.</p>
             `;
             
-            // Mencoba memuat dan menampilkan GIF
+            // Coba memuat dan menampilkan GIF
             await loadAndShowGif(gifUrl, percentage >= 60);
             
             // Tampilkan tombol mulai ulang
