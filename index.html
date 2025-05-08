@@ -951,6 +951,72 @@
             // Tambahkan efek mengapung ke gambar setelah beberapa detik
             setTimeout(addFloatEffect, 2000);
         };
+        // Fungsi untuk menambahkan efek suara hover pada tombol
+function addHoverSoundToButtons() {
+    // Buat elemen audio untuk hover sound
+    const hoverSound = document.createElement('audio');
+    hoverSound.id = 'hover-sound';
+    hoverSound.preload = 'auto';
+    hoverSound.volume = 0.3; // Set volume lebih rendah agar tidak mengganggu
+    
+    // Tambahkan source untuk file hover.mp3
+    const hoverSoundSource = document.createElement('source');
+    hoverSoundSource.src = 'assets/audio/hover.mp3';
+    hoverSoundSource.type = 'audio/mpeg';
+    
+    // Tambahkan source ke audio element
+    hoverSound.appendChild(hoverSoundSource);
+    
+    // Tambahkan ke body
+    document.body.appendChild(hoverSound);
+    
+    // Fungsi untuk memutar suara hover
+    function playHoverSound() {
+        // Reset dan putar audio
+        const sound = document.getElementById('hover-sound');
+        sound.currentTime = 0;
+        sound.play().catch(e => {
+            // Tangani error jika browser belum siap memutar audio
+            debug("Error playing hover sound: " + e);
+        });
+    }
+    
+    // Fungsi untuk menambahkan event listener hover ke elemen
+    function addHoverSound(selector) {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            element.addEventListener('mouseenter', playHoverSound);
+        });
+    }
+    
+    // Tambahkan event listener ke semua tombol yang ada
+    addHoverSound('.option');
+    addHoverSound('.control-button');
+    addHoverSound('.music-button');
+    
+    // Untuk tombol yang dibuat dinamis (seperti opsi jawaban)
+    // Gunakan MutationObserver untuk memantau perubahan DOM
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach((node) => {
+                    // Cek apakah node adalah elemen dan memiliki class yang sesuai
+                    if (node.nodeType === 1 && 
+                        (node.classList.contains('option') || 
+                         node.classList.contains('control-button'))) {
+                        node.addEventListener('mouseenter', playHoverSound);
+                    }
+                });
+            }
+        });
+    });
+    
+    // Mulai observasi pada container opsi dan container control button
+    observer.observe(document.getElementById('options'), { childList: true });
+    observer.observe(document.querySelector('.control-buttons'), { childList: true });
+    
+    debug("Hover sound effect added to buttons");
+}
     </script>
 </body>
 </html>
