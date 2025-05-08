@@ -78,6 +78,7 @@
             margin: 10px auto;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: block;
         }
         .score {
             font-size: 24px;
@@ -159,15 +160,6 @@
             border-radius: 5px;
             display: none;
         }
-        .emoji-feedback {
-            font-size: 64px;
-            margin: 20px 0;
-            animation: bounce 0.5s ease infinite alternate;
-        }
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
-        }
         @media (max-width: 600px) {
             .container {
                 padding: 10px;
@@ -199,7 +191,7 @@
             </div>
         </div>
         <div id="feedback" class="feedback">
-            <!-- Emoji akan digunakan sebagai pengganti GIF -->
+            <!-- Feedback akan ditampilkan di sini -->
         </div>
         <div id="score" class="score">Skor: 0</div>
         <div class="control-buttons">
@@ -214,15 +206,14 @@
         <span>Musik</span>
     </div>
 
-    <!-- Embedded Base64 Audio (untuk menghindari masalah loading) -->
     <audio id="correct-sound" preload="auto">
-        <!-- Base64 data akan diisi oleh JavaScript -->
+        <source src="assets/audio/correct.mp3" type="audio/mpeg">
     </audio>
     <audio id="incorrect-sound" preload="auto">
-        <!-- Base64 data akan diisi oleh JavaScript -->
+        <source src="assets/audio/incorrect.mp3" type="audio/mpeg">
     </audio>
     <audio id="bg-music" loop preload="auto">
-        <!-- Base64 data akan diisi oleh JavaScript (opsional) -->
+        <source src="assets/audio/bgmusic.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -278,19 +269,12 @@
             }
         ];
 
-        // Suara feedback sebagai Base64 Data URL 
-        // (Ini adalah contoh singkat. Dalam implementasi nyata, gunakan file audio yang sebenarnya dikodekan)
-        const correctSoundBase64 = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAbAAqKioqKioqKioqKioqKioqKioqKio19fX19fX19fX19fX19fX19fX19fX19f///////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAYFAAAAAAAAAbD5VWxLAAAAAAD/4zjMAAAEsEBFgSUEAAGMOAUDH/+SZP/LFXPK//0EJGHt2WKCAAQBAAEAUP8vUeTLgAIAAABBOIgEAQFnKqqqqqqqqpMDAwMDAjdPAAAAAABA9YeHh4e1r0HJgNPXVNfG3MvvW/5eHKqxwGLFzKFEvHW3lppnuaVNM7JtvZhYqbGK4pmQzIZepvUwupdl6llMakqmYajKMx5l1EbGnbbdlDXUcqalMrlUV7VVL0oZgNPTdtSXs5d1VXs6vU9nZvZiV0ZmBbdG40pxNKnXZXNJY1JJbVKIuJGZ8yxm9XZSxoUqRp9XUwAAAAAAAAAAAAA=";
-        const incorrectSoundBase64 = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAbAAqKioqKioqKioqKioqKioqKioqKio19fX19fX19fX19fX19fX19fX19fX19f///////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAYFAAAAAAAAAbD5VWxLAAAAAAD/4zjMAAAEsEBFgSUEAAGMOAUDH/+SZP/LFXPK//0EJGHt2WKCAAQBAAEAUP8vUeTLgAIAAABBOIgEAQFnKqqqqqqqqpMDAwMDAjdPAAAAAABA9YeHh4ewmGAyPOvVz+XfxrOVfhm2F1pFv8EixdXLJYWXXZ02m7l0sKNa+dOQ4nLJBQrJHArM75b9WKrM9hDPO82x6t5vnhUuFcuKpUYcC0vYs5i/CscUhcdOkFc88s56wZOXVnNLLGlwYTVpRp+jFdyirbKx7T8+N7VIu4nW0bfhU6a+z+3JnW3qqpzMaKdQAAAAAAAAAAAAA=";
-
-        // Emoji feedback
-        const correctEmojis = ["🎉", "👏", "✨", "🌟", "💯", "🏆"];
-        const incorrectEmojis = ["😢", "🙁", "😔", "🤔", "📚", "💪"];
-
+        // Variabel global
         let currentQuestion = 0;
         let score = 0;
         let isMusicPlaying = false;
         let answersDisabled = false;
+        let audioInitialized = false;
 
         // Elemen DOM
         const questionText = document.getElementById("question-text");
@@ -308,37 +292,28 @@
         const incorrectSound = document.getElementById("incorrect-sound");
         const backgroundMusic = document.getElementById("bg-music");
 
-        // Inisialisasi audio dengan source data URL
-        function setupAudio() {
-            // Menetapkan source untuk suara feedback
-            correctSound.src = correctSoundBase64;
-            incorrectSound.src = incorrectSoundBase64;
-            
-            // Suara latar belakang tetap menggunakan file
-            backgroundMusic.src = "assets/audio/bgmusic.mp3";
-            backgroundMusic.volume = 0.5;
-            
-            debug("Audio setup complete with data URLs");
-            
-            // Aktifkan interaksi audio saat pengguna berinteraksi
-            document.addEventListener("click", function initAudioOnce() {
-                correctSound.play().then(() => {
-                    correctSound.pause();
-                    correctSound.currentTime = 0;
-                }).catch(e => debug("Error initializing audio: " + e));
+        // Fungsi untuk inisialisasi audio
+        function initAudio() {
+            if (!audioInitialized) {
+                // Set volume untuk audio background music
+                backgroundMusic.volume = 0.5;
                 
-                incorrectSound.play().then(() => {
-                    incorrectSound.pause();
-                    incorrectSound.currentTime = 0;
-                }).catch(e => debug("Error initializing audio: " + e));
+                // Pre-load audio untuk mengurangi delay
+                correctSound.load();
+                incorrectSound.load();
+                backgroundMusic.load();
                 
-                document.removeEventListener("click", initAudioOnce);
-                debug("Audio initialized on user interaction");
-            }, {once: true});
+                debug("Audio elements initialized");
+                audioInitialized = true;
+            }
         }
 
         // Kontrol musik latar
         musicToggle.addEventListener("click", () => {
+            if (!audioInitialized) {
+                initAudio();
+            }
+            
             if (isMusicPlaying) {
                 backgroundMusic.pause();
                 musicToggle.innerHTML = "♫";
@@ -368,7 +343,7 @@
         function initQuiz() {
             currentQuestion = 0;
             score = 0;
-            setupAudio();
+            initAudio();
             preloadImages();
             
             // Reset tampilan
@@ -436,15 +411,22 @@
             const question = questions[currentQuestion];
             const isCorrect = selectedOption === question.answer;
             
-            // Play sound immediately before any other operations
-            if (isCorrect) {
-                // Reset posisi dan putar
-                correctSound.currentTime = 0;
-                correctSound.play().catch(e => debug("Error playing sound: " + e));
-            } else {
-                // Reset posisi dan putar
-                incorrectSound.currentTime = 0;
-                incorrectSound.play().catch(e => debug("Error playing sound: " + e));
+            // Pastikan audio sudah diinisialisasi
+            if (!audioInitialized) {
+                initAudio();
+            }
+            
+            // Play sound feedback
+            try {
+                if (isCorrect) {
+                    correctSound.currentTime = 0;
+                    correctSound.play();
+                } else {
+                    incorrectSound.currentTime = 0;
+                    incorrectSound.play();
+                }
+            } catch (e) {
+                debug("Error playing sound: " + e);
             }
             
             // Nonaktifkan semua tombol opsi
@@ -458,19 +440,17 @@
                 }
             });
             
-            // Tampilkan feedback dengan emoji (bukan GIF)
+            // Tampilkan feedback dengan GIF
             if (isCorrect) {
                 score++;
-                const emoji = correctEmojis[Math.floor(Math.random() * correctEmojis.length)];
                 feedbackContainer.innerHTML = `
                     <p style='color: green; font-weight: bold; font-size: 24px;'>Benar!</p>
-                    <div class="emoji-feedback">${emoji}</div>
+                    <img src="assets/gifs/correct1.gif" class="feedback-gif" alt="Correct feedback">
                 `;
             } else {
-                const emoji = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)];
                 feedbackContainer.innerHTML = `
                     <p style='color: red; font-weight: bold; font-size: 24px;'>Oops! Jawaban yang benar adalah ${question.answer}</p>
-                    <div class="emoji-feedback">${emoji}</div>
+                    <img src="assets/gifs/incorrect1.gif" class="feedback-gif" alt="Incorrect feedback">
                 `;
             }
             
@@ -494,22 +474,22 @@
             
             const percentage = (score / questions.length) * 100;
             let message;
-            let emoji;
+            let resultGif;
             
             if (percentage >= 80) {
                 message = "Luar biasa! Kamu sangat pintar!";
-                emoji = "🌟🏆👏";
+                resultGif = "assets/gifs/correct1.gif";
             } else if (percentage >= 60) {
                 message = "Bagus! Kamu melakukannya dengan baik!";
-                emoji = "👍✨🎉";
+                resultGif = "assets/gifs/correct1.gif";
             } else {
                 message = "Jangan menyerah! Coba lagi ya!";
-                emoji = "💪📚🤗";
+                resultGif = "assets/gifs/incorrect1.gif";
             }
             
             feedbackContainer.innerHTML = `
                 <p style='font-size: 24px; font-weight: bold;'>${message}</p>
-                <div class="emoji-feedback">${emoji}</div>
+                <img src="${resultGif}" class="feedback-gif" alt="Result feedback">
                 <p>Kamu mendapatkan ${score} dari ${questions.length} soal.</p>
             `;
             
@@ -525,6 +505,12 @@
         });
         
         restartButton.addEventListener("click", initQuiz);
+
+        // Inisialisasi audio saat interaksi pertama dengan dokumen
+        document.addEventListener("click", function initAudioOnFirstInteraction() {
+            initAudio();
+            document.removeEventListener("click", initAudioOnFirstInteraction);
+        }, { once: true });
 
         // Mulai kuis saat halaman dimuat
         window.onload = initQuiz;
