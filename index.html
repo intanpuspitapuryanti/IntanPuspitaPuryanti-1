@@ -3,666 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunia Anak Interaktif</title>
+    <title>Kuis Hewan untuk Anak-anak</title>
     <style>
         body {
             font-family: 'Comic Sans MS', cursive, sans-serif;
             background-color: #f0f8ff;
             margin: 0;
-            padding: 0;
-            color: #333;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
-        }
-        
-        header {
-            background-color: #70c1ff;
-            color: white;
             text-align: center;
-            padding: 20px 0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-image: url('./assets/images/background.jpg');
+            background-size: cover;
+            background-attachment: fixed;
         }
-        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
         h1 {
-            margin: 0;
-            font-size: 2.5em;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 36px;
         }
-        
-        .menu {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+        .question-container {
+            margin: 30px 0;
+            font-size: 24px;
+            color: #4a4a4a;
         }
-        
-        .menu-item {
-            background-color: #ff9e80;
-            color: white;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        
-        .menu-item:hover {
-            background-color: #ff6e40;
-            transform: scale(1.05);
-        }
-        
-        .content-section {
-            display: none;
-            background-color: white;
+        .question-image {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
             border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            animation: fadeIn 0.5s;
+            margin: 15px auto;
+            border: 5px solid #ffd166;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        
-        .active-section {
-            display: block;
-        }
-        
-        .game-container {
+        .options {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 100px);
-            grid-gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .card {
-            width: 100px;
-            height: 100px;
-            background-color: #ffeb3b;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            transform-style: preserve-3d;
-        }
-        
-        .card:hover {
-            transform: scale(1.05);
-        }
-        
-        .card.flipped {
-            transform: rotateY(180deg);
-            background-color: #fff;
-        }
-        
-        .card-content {
-            display: none;
-            font-size: 50px;
-        }
-        
-        .card.flipped .card-content {
-            display: block;
-        }
-        
-        .quiz-container {
-            padding: 20px;
-        }
-        
-        .quiz-question {
-            font-size: 1.3em;
-            margin-bottom: 15px;
-        }
-        
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .quiz-option {
-            background-color: #e3f2fd;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .quiz-option:hover {
-            background-color: #bbdefb;
-        }
-        
-        .correct {
-            background-color: #a5d6a7 !important;
-        }
-        
-        .wrong {
-            background-color: #ef9a9a !important;
-        }
-        
-        .story-container {
-            padding: 20px;
-            font-size: 1.2em;
-            line-height: 1.6;
-        }
-        
-        .story-image {
-            max-width: 100%;
-            height: auto;
-            margin: 20px 0;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .color-book {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .drawing-area {
-            border: 2px dashed #aaa;
-            width: 500px;
-            height: 400px;
-            margin-top: 20px;
-            cursor: crosshair;
-            background-color: white;
-        }
-        
-        .color-palette {
-            display: flex;
-            margin-top: 20px;
             flex-wrap: wrap;
             justify-content: center;
-        }
-        
-        .color {
-            width: 30px;
-            height: 30px;
-            margin: 5px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            transition: transform 0.2s ease;
-        }
-        
-        .color:hover {
-            transform: scale(1.2);
-        }
-        
-        .tools {
+            gap: 15px;
             margin-top: 20px;
-            display: flex;
-            gap: 10px;
         }
-        
-        button {
-            background-color: #64b5f6;
+        .option {
+            padding: 12px 25px;
+            background-color: #4ecdc4;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 30px;
+            font-size: 18px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s, background-color 0.2s;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            min-width: 150px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
-        button:hover {
-            background-color: #2196f3;
+        .option:hover {
+            transform: scale(1.05);
+            background-color: #3dbdb4;
         }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #70c1ff;
-            color: white;
+        .feedback {
+            margin-top: 20px;
+            font-size: 20px;
+            height: 280px;
+        }
+        .feedback-gif {
+            width: 200px;
+            height: 200px;
+            display: none;
+            margin: 10px auto;
             border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b6b;
             margin-top: 20px;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .control-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
-        
-        /* Responsiveness */
-        @media (max-width: 768px) {
-            .game-board {
-                grid-template-columns: repeat(3, 80px);
+        .control-button {
+            padding: 10px 20px;
+            background-color: #ff9f1c;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .control-button:hover {
+            background-color: #f08c00;
+            transform: scale(1.05);
+        }
+        .progress-container {
+            width: 80%;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            margin: 20px auto;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #6a5acd;
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .music-button {
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .music-button:hover {
+            transform: scale(1.1);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
             }
-            
-            .card {
-                width: 80px;
-                height: 80px;
+            h1 {
+                font-size: 28px;
             }
-            
-            .drawing-area {
-                width: 300px;
-                height: 300px;
+            .question-container {
+                font-size: 18px;
+            }
+            .option {
+                font-size: 16px;
+                min-width: 120px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Dunia Anak Interaktif</h1>
-            <p>Media Pembelajaran Interaktif untuk Anak-anak</p>
-        </header>
-        
-        <div class="menu">
-            <div class="menu-item" onclick="showSection('game')">Permainan Memori</div>
-            <div class="menu-item" onclick="showSection('quiz')">Kuis Cerdas</div>
-            <div class="menu-item" onclick="showSection('story')">Cerita Interaktif</div>
-            <div class="menu-item" onclick="showSection('coloring')">Mewarnai</div>
+        <h1>Kuis Hewan untuk Anak-anak</h1>
+        <div class="progress-container">
+            <div id="progress" class="progress-bar"></div>
         </div>
-        
-        <div id="game" class="content-section">
-            <h2>Permainan Memori</h2>
-            <p>Cocokkan kartu dengan gambar yang sama. Latih kemampuan memori Anda!</p>
-            <div class="game-container">
-                <div class="game-board">
-                    <!-- Cards will be generated by JavaScript -->
-                </div>
-                <button onclick="resetMemoryGame()" style="margin-top: 20px;">Mulai Baru</button>
+        <div id="question-container" class="question-container">
+            <div id="question-text">Pertanyaan di sini</div>
+            <img id="question-image" class="question-image" src="" alt="Gambar hewan">
+            <div class="options" id="options">
+                <!-- Opsi jawaban akan ditampilkan di sini -->
             </div>
         </div>
-        
-        <div id="quiz" class="content-section">
-            <h2>Kuis Cerdas</h2>
-            <p>Jawab pertanyaan-pertanyaan berikut dengan benar!</p>
-            <div class="quiz-container">
-                <div class="quiz-question" id="question"></div>
-                <div class="quiz-options" id="options"></div>
-                <button onclick="nextQuestion()" style="margin-top: 20px;">Pertanyaan Berikutnya</button>
-            </div>
+        <div id="feedback" class="feedback">
+            <img id="feedback-gif" class="feedback-gif" src="" alt="Feedback">
         </div>
-        
-        <div id="story" class="content-section">
-            <h2>Cerita Interaktif</h2>
-            <div class="story-container">
-                <h3>Petualangan di Hutan Ajaib</h3>
-                <p>Suatu hari, seorang anak bernama <span id="main-character" style="color: #2196f3; font-weight: bold; cursor: pointer;" onclick="changeName()">Adi</span> sedang berjalan-jalan di dekat hutan.</p>
-                <img src="/api/placeholder/600/400" alt="placeholder" class="story-image" />
-                <p>"Wah, ada jalan setapak yang menarik!" kata <span class="character-name">Adi</span>. <span class="character-name">Adi</span> memutuskan untuk mengikuti jalan itu.</p>
-                <p>Tiba-tiba, <span class="character-name">Adi</span> melihat seekor <span id="animal" style="color: #ff5722; font-weight: bold; cursor: pointer;" onclick="changeAnimal()">kelinci</span> yang bisa berbicara!</p>
-                <p>"Halo!" sapa <span class="animal-type">kelinci</span> itu. "Maukah kamu membantuku menemukan <span id="treasure" style="color: #4caf50; font-weight: bold; cursor: pointer;" onclick="changeTreasure()">buku ajaib</span>?"</p>
-                <p><span class="character-name">Adi</span> mengangguk dengan senang. "Tentu saja! Di mana kita harus mencarinya?"</p>
-                <p>Mereka berjalan lebih jauh ke dalam hutan dan menemukan <span class="treasure-type">buku ajaib</span> itu di bawah pohon besar.</p>
-                <p><span class="animal-type">Kelinci</span> sangat berterima kasih dan mengajarkan <span class="character-name">Adi</span> tentang keajaiban alam.</p>
-                <div style="margin-top: 20px;">
-                    <button onclick="randomizeStory()">Acak Cerita</button>
-                </div>
-            </div>
+        <div id="score" class="score">Skor: 0</div>
+        <div class="control-buttons">
+            <button id="next-button" class="control-button" style="display: none;">Pertanyaan Berikutnya</button>
+            <button id="restart-button" class="control-button" style="display: none;">Mulai Ulang Kuis</button>
         </div>
-        
-        <div id="coloring" class="content-section">
-            <h2>Buku Mewarnai</h2>
-            <p>Gunakan kreativitasmu untuk mewarnai!</p>
-            <div class="color-book">
-                <canvas id="drawing-canvas" class="drawing-area"></canvas>
-                <div class="color-palette">
-                    <div class="color" style="background-color: red;" onclick="selectColor('red')"></div>
-                    <div class="color" style="background-color: orange;" onclick="selectColor('orange')"></div>
-                    <div class="color" style="background-color: yellow;" onclick="selectColor('yellow')"></div>
-                    <div class="color" style="background-color: green;" onclick="selectColor('green')"></div>
-                    <div class="color" style="background-color: blue;" onclick="selectColor('blue')"></div>
-                    <div class="color" style="background-color: purple;" onclick="selectColor('purple')"></div>
-                    <div class="color" style="background-color: pink;" onclick="selectColor('pink')"></div>
-                    <div class="color" style="background-color: brown;" onclick="selectColor('brown')"></div>
-                    <div class="color" style="background-color: black;" onclick="selectColor('black')"></div>
-                    <div class="color" style="background-color: white;" onclick="selectColor('white')"></div>
-                </div>
-                <div class="tools">
-                    <button onclick="clearCanvas()">Hapus Semua</button>
-                    <input type="range" min="1" max="20" value="5" id="brush-size" oninput="changeBrushSize(this.value)">
-                    <label for="brush-size">Ukuran Kuas</label>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Media Interaktif Anak-Anak &copy; 2025</p>
-            <p>Dibuat untuk memenuhi tugas UTS Media Interaktif</p>
-        </footer>
+    </div>
+
+    <div class="music-controls">
+        <button id="music-toggle" class="music-button">♫</button>
+        <span>Musik</span>
     </div>
 
     <script>
-        // Show the selected section
-        function showSection(sectionId) {
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => {
-                section.classList.remove('active-section');
-            });
-            document.getElementById(sectionId).classList.add('active-section');
-        }
-
-        // Initialize the page with the first section visible
-        window.onload = function() {
-            showSection('game');
-            initMemoryGame();
-            initQuiz();
-            initCanvas();
-        };
-
-        // Memory Game Logic
-        const emojis = ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨'];
-        let cards = [];
-        let flippedCards = [];
-        let matchedPairs = 0;
-
-        function initMemoryGame() {
-            const gameBoard = document.querySelector('.game-board');
-            gameBoard.innerHTML = '';
-            cards = [];
-            flippedCards = [];
-            matchedPairs = 0;
-            
-            // Create pairs of cards
-            const cardValues = [...emojis, ...emojis];
-            // Shuffle
-            for (let i = cardValues.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [cardValues[i], cardValues[j]] = [cardValues[j], cardValues[i]];
-            }
-            
-            // Create card elements
-            cardValues.forEach((value, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.dataset.value = value;
-                card.dataset.index = index;
-                
-                const content = document.createElement('div');
-                content.className = 'card-content';
-                content.textContent = value;
-                
-                card.appendChild(content);
-                card.addEventListener('click', flipCard);
-                gameBoard.appendChild(card);
-                cards.push(card);
-            });
-        }
-
-        function flipCard() {
-            if (flippedCards.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
-                this.classList.add('flipped');
-                flippedCards.push(this);
-                
-                if (flippedCards.length === 2) {
-                    setTimeout(checkMatch, 500);
-                }
-            }
-        }
-
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
-            
-            if (card1.dataset.value === card2.dataset.value) {
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                matchedPairs++;
-                
-                if (matchedPairs === emojis.length) {
-                    setTimeout(() => {
-                        alert('Selamat! Anda telah menyelesaikan permainan memori!');
-                    }, 500);
-                }
-            } else {
-                card1.classList.remove('flipped');
-                card2.classList.remove('flipped');
-            }
-            
-            flippedCards = [];
-        }
-
-        function resetMemoryGame() {
-            initMemoryGame();
-        }
-
-        // Quiz Logic
-        const quizQuestions = [
+        // Data kuis dengan gambar dari folder assets
+        const questions = [
             {
-                question: "Berapa jumlah warna pelangi?",
-                options: ["5", "6", "7", "8"],
-                correctAnswer: 2
+                question: "Hewan apa ini?",
+                image: "./assets/images/cat.jpg",
+                imageAlt: "Kucing",
+                options: ["Kucing", "Anjing", "Kelinci", "Hamster"],
+                answer: "Kucing"
             },
             {
-                question: "Hewan apa yang bisa terbang?",
-                options: ["Ikan", "Burung", "Gajah", "Jerapah"],
-                correctAnswer: 1
+                question: "Hewan apa ini?",
+                image: "./assets/images/elephant.jpg",
+                imageAlt: "Gajah",
+                options: ["Jerapah", "Gajah", "Singa", "Harimau"],
+                answer: "Gajah"
             },
             {
-                question: "Berapa hasil dari 5 + 3?",
-                options: ["7", "8", "9", "10"],
-                correctAnswer: 1
+                question: "Hewan apa ini?",
+                image: "./assets/images/monkey.jpg",
+                imageAlt: "Monyet",
+                options: ["Gorila", "Orangutan", "Monyet", "Simpanse"],
+                answer: "Monyet"
             },
             {
-                question: "Buah apa yang berwarna merah dan berbentuk hati?",
-                options: ["Pisang", "Jeruk", "Stroberi", "Anggur"],
-                correctAnswer: 2
+                question: "Hewan apa ini?",
+                image: "./assets/images/fish.jpg",
+                imageAlt: "Ikan",
+                options: ["Ikan", "Ubur-ubur", "Gurita", "Lumba-lumba"],
+                answer: "Ikan"
             },
             {
-                question: "Apa warna langit di siang hari yang cerah?",
-                options: ["Merah", "Biru", "Hijau", "Kuning"],
-                correctAnswer: 1
+                question: "Hewan apa ini?",
+                image: "./assets/images/bird.jpg",
+                imageAlt: "Burung",
+                options: ["Ayam", "Bebek", "Burung", "Angsa"],
+                answer: "Burung"
             }
         ];
 
+        // Audio untuk feedback
+        const correctSound = new Audio("./assets/audio/correct.mp3");
+        const incorrectSound = new Audio("./assets/audio/incorrect.mp3");
+        
+        // GIF Feedback dari folder assets
+        const correctGifs = [
+            "./assets/gifs/correct1.gif", // Tepuk tangan
+            "./assets/gifs/correct2.gif", // Bintang
+            "./assets/gifs/correct3.gif"  // Thumbs up
+        ];
+        
+        const incorrectGifs = [
+            "./assets/gifs/incorrect1.gif", // Kecewa
+            "./assets/gifs/incorrect2.gif", // Sedih
+            "./assets/gifs/incorrect3.gif"  // Coba lagi
+        ];
+
+        // Musik latar
+        const backgroundMusic = new Audio("./assets/audio/bgmusic.mp3");
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 0.5;
+
         let currentQuestion = 0;
+        let score = 0;
+        let isMusicPlaying = false;
 
-        function initQuiz() {
-            showQuestion(0);
-        }
+        // Elemen DOM
+        const questionText = document.getElementById("question-text");
+        const questionImage = document.getElementById("question-image");
+        const optionsContainer = document.getElementById("options");
+        const feedbackContainer = document.getElementById("feedback");
+        const feedbackGif = document.getElementById("feedback-gif");
+        const scoreElement = document.getElementById("score");
+        const nextButton = document.getElementById("next-button");
+        const restartButton = document.getElementById("restart-button");
+        const progressBar = document.getElementById("progress");
+        const musicToggle = document.getElementById("music-toggle");
 
-        function showQuestion(index) {
-            if (index >= quizQuestions.length) {
-                index = 0;
-            }
-            
-            currentQuestion = index;
-            const questionElement = document.getElementById('question');
-            const optionsElement = document.getElementById('options');
-            
-            questionElement.textContent = quizQuestions[index].question;
-            optionsElement.innerHTML = '';
-            
-            quizQuestions[index].options.forEach((option, i) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'quiz-option';
-                optionElement.textContent = option;
-                optionElement.dataset.index = i;
-                optionElement.addEventListener('click', checkAnswer);
-                optionsElement.appendChild(optionElement);
-            });
-        }
-
-        function checkAnswer() {
-            const selectedIndex = parseInt(this.dataset.index);
-            const correctIndex = quizQuestions[currentQuestion].correctAnswer;
-            
-            document.querySelectorAll('.quiz-option').forEach(option => {
-                option.classList.remove('correct', 'wrong');
-                option.removeEventListener('click', checkAnswer);
-            });
-            
-            if (selectedIndex === correctIndex) {
-                this.classList.add('correct');
+        // Kontrol musik
+        musicToggle.addEventListener("click", () => {
+            if (isMusicPlaying) {
+                backgroundMusic.pause();
+                musicToggle.innerHTML = "♫";
             } else {
-                this.classList.add('wrong');
-                document.querySelectorAll('.quiz-option')[correctIndex].classList.add('correct');
+                backgroundMusic.play().catch(e => {
+                    console.log("Autoplay diblokir: Klik tombol musik untuk memutar");
+                    alert("Klik tombol musik untuk memulai musik latar!");
+                });
+                musicToggle.innerHTML = "⏸";
             }
-        }
+            isMusicPlaying = !isMusicPlaying;
+        });
 
-        function nextQuestion() {
-            showQuestion(currentQuestion + 1);
-        }
-
-        // Interactive Story Logic
-        const names = ['Adi', 'Budi', 'Citra', 'Dina', 'Eko'];
-        const animals = ['kelinci', 'burung', 'tupai', 'kucing', 'rubah'];
-        const treasures = ['buku ajaib', 'kunci emas', 'peta harta karun', 'kristal bercahaya', 'tongkat sihir'];
-
-        function changeName() {
-            const currentName = document.getElementById('main-character').textContent;
-            const currentIndex = names.indexOf(currentName);
-            const newIndex = (currentIndex + 1) % names.length;
-            const newName = names[newIndex];
+        // Memuat gambar di awal
+        function preloadImages() {
+            questions.forEach(q => {
+                const img = new Image();
+                img.src = q.image;
+            });
             
-            document.getElementById('main-character').textContent = newName;
-            document.querySelectorAll('.character-name').forEach(el => {
-                el.textContent = newName;
+            correctGifs.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+            
+            incorrectGifs.forEach(url => {
+                const img = new Image();
+                img.src = url;
             });
         }
 
-        function changeAnimal() {
-            const currentAnimal = document.getElementById('animal').textContent;
-            const currentIndex = animals.indexOf(currentAnimal);
-            const newIndex = (currentIndex + 1) % animals.length;
-            const newAnimal = animals[newIndex];
+        // Inisialisasi kuis
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            showQuestion();
+            updateScore();
+            restartButton.style.display = "none";
+            preloadImages();
             
-            document.getElementById('animal').textContent = newAnimal;
-            document.querySelectorAll('.animal-type').forEach(el => {
-                el.textContent = newAnimal;
-            });
+            // Menampilkan pop-up untuk memulai musik
+            setTimeout(() => {
+                alert("Selamat datang di Kuis Hewan untuk Anak-anak! Klik tombol musik di pojok kanan bawah untuk memulai musik latar.");
+            }, 1000);
         }
 
-        function changeTreasure() {
-            const currentTreasure = document.getElementById('treasure').textContent;
-            const currentIndex = treasures.indexOf(currentTreasure);
-            const newIndex = (currentIndex + 1) % treasures.length;
-            const newTreasure = treasures[newIndex];
+        // Menampilkan pertanyaan
+        function showQuestion() {
+            nextButton.style.display = "none";
+            feedbackGif.style.display = "none";
+            feedbackContainer.innerHTML = "";
             
-            document.getElementById('treasure').textContent = newTreasure;
-            document.querySelectorAll('.treasure-type').forEach(el => {
-                el.textContent = newTreasure;
-            });
-        }
-
-        function randomizeStory() {
-            const randomName = names[Math.floor(Math.random() * names.length)];
-            const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
-            const randomTreasure = treasures[Math.floor(Math.random() * treasures.length)];
-            
-            document.getElementById('main-character').textContent = randomName;
-            document.getElementById('animal').textContent = randomAnimal;
-            document.getElementById('treasure').textContent = randomTreasure;
-            
-            document.querySelectorAll('.character-name').forEach(el => {
-                el.textContent = randomName;
-            });
-            document.querySelectorAll('.animal-type').forEach(el => {
-                el.textContent = randomAnimal;
-            });
-            document.querySelectorAll('.treasure-type').forEach(el => {
-                el.textContent = randomTreasure;
-            });
-        }
-
-        // Drawing Canvas Logic
-        let canvas, ctx;
-        let isDrawing = false;
-        let currentColor = 'black';
-        let brushSize = 5;
-
-        function initCanvas() {
-            canvas = document.getElementById('drawing-canvas');
-            ctx = canvas.getContext('2d');
-            
-            // Set canvas dimensions
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
-            // Set background to white
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Drawing event listeners
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            
-            // Touch support
-            canvas.addEventListener('touchstart', handleTouch);
-            canvas.addEventListener('touchmove', handleTouch);
-            canvas.addEventListener('touchend', stopDrawing);
-        }
-
-        function startDrawing(e) {
-            isDrawing = true;
-            draw(e);
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-            
-            ctx.lineWidth = brushSize;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = currentColor;
-            
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-
-        function handleTouch(e) {
-            e.preventDefault();
-            if (e.type === 'touchstart') {
-                isDrawing = true;
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
             }
             
-            if (isDrawing) {
-                const touch = e.touches[0];
-                const rect = canvas.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                
-                ctx.lineWidth = brushSize;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = currentColor;
-                
-                ctx.lineTo(x, y);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(x, y);
+            const question = questions[currentQuestion];
+            questionText.textContent = question.question;
+            questionImage.src = question.image;
+            questionImage.alt = question.imageAlt;
+            
+            optionsContainer.innerHTML = "";
+            question.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.className = "option";
+                button.addEventListener("click", () => checkAnswer(option));
+                optionsContainer.appendChild(button);
+            });
+            
+            // Update progress bar
+            progressBar.style.width = `${(currentQuestion / questions.length) * 100}%`;
+        }
+
+        // Memeriksa jawaban
+        function checkAnswer(selectedOption) {
+            const question = questions[currentQuestion];
+            const isCorrect = selectedOption === question.answer;
+            
+            // Nonaktifkan semua tombol opsi
+            const optionButtons = document.querySelectorAll(".option");
+            optionButtons.forEach(button => {
+                button.disabled = true;
+                if (button.textContent === question.answer) {
+                    button.style.backgroundColor = "#4CAF50"; // Hijau untuk jawaban benar
+                } else if (button.textContent === selectedOption && !isCorrect) {
+                    button.style.backgroundColor = "#F44336"; // Merah untuk jawaban salah yang dipilih
+                }
+            });
+            
+            // Tampilkan feedback
+            if (isCorrect) {
+                score++;
+                correctSound.play().catch(e => console.log("Audio tidak dapat diputar otomatis"));
+                feedbackContainer.innerHTML = "<p style='color: green; font-weight: bold; font-size: 24px;'>Benar! 🎉</p>";
+                feedbackGif.src = correctGifs[Math.floor(Math.random() * correctGifs.length)];
+            } else {
+                incorrectSound.play().catch(e => console.log("Audio tidak dapat diputar otomatis"));
+                feedbackContainer.innerHTML = `<p style='color: red; font-weight: bold; font-size: 24px;'>Oops! Jawaban yang benar adalah ${question.answer} 😢</p>`;
+                feedbackGif.src = incorrectGifs[Math.floor(Math.random() * incorrectGifs.length)];
             }
+            
+            feedbackGif.style.display = "block";
+            updateScore();
+            
+            // Tampilkan tombol selanjutnya
+            nextButton.style.display = "block";
         }
 
-        function stopDrawing() {
-            isDrawing = false;
-            ctx.beginPath();
+        // Update skor
+        function updateScore() {
+            scoreElement.textContent = `Skor: ${score}`;
         }
 
-        function selectColor(color) {
-            currentColor = color;
+        // Menampilkan hasil akhir
+        function showResults() {
+            questionText.textContent = "Kuis Selesai!";
+            questionImage.style.display = "none";
+            optionsContainer.innerHTML = "";
+            
+            const percentage = (score / questions.length) * 100;
+            let message;
+            let gifUrl;
+            
+            if (percentage >= 80) {
+                message = "Luar biasa! Kamu sangat pintar! 🌟";
+                gifUrl = correctGifs[0]; // Tepuk tangan
+            } else if (percentage >= 60) {
+                message = "Bagus! Kamu melakukannya dengan baik! 👍";
+                gifUrl = correctGifs[2]; // Thumbs up
+            } else {
+                message = "Jangan menyerah! Coba lagi ya! 💪";
+                gifUrl = incorrectGifs[2]; // Coba lagi
+            }
+            
+            feedbackContainer.innerHTML = `
+                <p style='font-size: 24px; font-weight: bold;'>${message}</p>
+                <p>Kamu mendapatkan ${score} dari ${questions.length} soal.</p>
+            `;
+            
+            feedbackGif.src = gifUrl;
+            feedbackGif.style.display = "block";
+            
+            // Tampilkan tombol mulai ulang
+            restartButton.style.display = "block";
+            progressBar.style.width = "100%";
         }
 
-        function changeBrushSize(size) {
-            brushSize = size;
-        }
+        // Event listener
+        nextButton.addEventListener("click", () => {
+            currentQuestion++;
+            showQuestion();
+        });
+        
+        restartButton.addEventListener("click", initQuiz);
 
-        function clearCanvas() {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+        // Mulai kuis saat halaman dimuat
+        window.onload = initQuiz;
     </script>
 </body>
 </html>
